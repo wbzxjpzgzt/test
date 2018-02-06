@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.baizhi.dao.ArticleDAO">
+<!-- <cache 	type="com.baizhi.dao.cache.SsdbCache" 
+		eviction="LRU"  
+		flushInterval="6000000"  
+		size="1024"  
+		readOnly="false"
+		/> -->
+<cache type="org.mybatis.caches.memcached.MemcachedCache" />	
+<resultMap type="article" id="articleMap">
+	<id column="aartid" property="artid"/>
+	<result column="aartname" property="artname"/>
+	<result column="aartcontent" property="artcontent"/>
+	<result column="amid" property="mid"/>
+	<result column="aarttime" property="arttime"/>
+	<result column="aclicks" property="clicks"/>
+	<result column="astatus" property="status"/>
+	<result column="aartpic" property="artpic"/>
+	<association property="master" javaType="master">
+		<id column="bmid" property="mid"/>
+		<result column="bmasterhead" property="masterhead"/>
+	</association>
+</resultMap>
+<sql id="ARTICEMASTER">
+	a.artid as aartid,a.artname as aartname,a.artcontent as aartcontent,a.mid as amid,a.arttime as aarttime,
+	a.clicks as aclicks, a.status as astatus,a.artpic as aartpic,
+	b.mid as bmid,b.masterhead as bmasterhead
+</sql>
+<select id="queryPage" resultType="article">
+	select * from article limit #{start},#{end}
+</select>
+	
+<select id="queryCountArticle" resultType="Integer">
+	select count(*) from article
+</select>
+<select id="queryOneArticle" resultMap="articleMap">
+	select <include refid="ARTICEMASTER"/>
+	from 
+	article a left join master b 
+	on a.mid=b.mid
+	where a.artid=#{artid}
+</select>
+<select id="queryAllArticle" resultMap="articleMap">
+	select <include refid="ARTICEMASTER"/>
+	from 
+	article a left join master b on a.mid=b.mid  
+</select>
+<insert id="insertArticle">
+	
+	insert into article value(
+						#{artid},
+						#{artname},
+						#{artcontent},
+						#{mid},
+						#{arttime},
+						#{clicks},
+						#{status},
+						#{artpic}
+	)
+	<selectKey resultType="Integer" keyProperty="artid">
+		select last_insert_id() 
+	</selectKey>
+</insert>
+<update id="updateArticle">
+	update article  set 
+					artname=#{artname},
+					artcontent=#{artcontent},
+					mid=#{mid},
+					arttime=#{arttime},
+					clicks=#{clicks},
+					status=#{status},
+					artpic=#{artpic}
+			where artid=#{artid}
+</update>
+</mapper>

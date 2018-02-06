@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.baizhi.dao.AlbumDAO">
+<resultMap type="album" id="albumMap">
+	<id column="aaid" property="aid"/>
+	<result column="aaname" property="aname"/>
+	<result column="aacontent" property="acontent"/>
+	<result column="aapictureurl" property="apictureurl"/>
+	<result column="amid" property="mid"/>
+	<result column="aagrade" property="agrade"/>
+	<result column="astatus" property="status"/>
+	<result column="aatime" property="atime"/>
+	<association property="master" javaType="master">
+		<id column="bmid" property="mid"/>
+		<result column="bmasterhead" property="masterhead"/>
+	</association>
+</resultMap>
+<sql id="ALBUMMASTER">
+	a.aid as aaid,a.aname as aaname,a.acontent as aacontent,a.apictureurl as aapictureurl,
+	a.mid as amid,a.agrade as aagrade,a.status as astatus,a.atime as aatime,
+	b.mid as bmid,b.masterhead as bmasterhead
+</sql>
+<select id="queryAllAlbum" resultMap="albumMap">
+	select <include refid="ALBUMMASTER"/>
+	from album a left join master b 
+	on a.mid=b.mid
+</select>
+<select id="queryByPage" resultMap="albumMap">
+	select <include refid="ALBUMMASTER"/>
+	from album a left join master b 
+	on a.mid=b.mid 
+	limit #{start},#{end}
+</select>
+<select id="queryAlbumCount" resultType="Integer">
+	select count(*) from album
+</select>
+</mapper>

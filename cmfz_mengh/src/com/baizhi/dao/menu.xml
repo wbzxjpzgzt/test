@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.baizhi.dao.MenuDAO">
+<resultMap type="menu" id="menuMap">
+	<id column="pmenuid" property="menuid"/>
+	<result column="pmenuname" property="menuname"/>
+	<result column="piconCls" property="iconCls"/>
+	<result column="purl" property="url"/>
+	<result column="pparent_id" property="parent_id"/>
+	<!-- 关系属性 -->
+	<collection property="list" ofType="menu">
+   		<id column="cmenuid" property="menuid" />
+   		<result column="cmenuname" property="menuname" />
+   		<result column="ciconCls" property="iconCls"/>
+		<result column="curl" property="url"/>
+		<result column="cparent_id" property="parent_id"/>
+   	</collection>
+</resultMap>
+	<sql id="SQLMENU">
+		p.menuid as pmenuid,p.menuname as pmenuname,p.iconCls as piconCls,p.url as purl,p.parent_id as pparent_id,
+		c.menuid as cmenuid,c.menuname as cmenuname,c.iconCls as ciconCls,c.url as curl,c.parent_id as cparent_id
+		from menu p left join menu c 
+		on p.menuid=c.parent_id
+	</sql>
+	<select id="queryAllMenu" resultMap="menuMap">
+		select 
+		<include refid="SQLMENU"/>
+		<where>
+			p.parent_id is null
+		</where>	
+	</select>
+	<select id="queryByParentId" resultMap="menuMap">
+		select 
+		<include refid="SQLMENU"/>
+		<where>
+			p.parent_id=#{parent_id}
+		</where>	
+	</select>
+	<update id="updateMenu" >
+		update 
+		menu
+		set menuid=#{menuid},
+			menuname=#{menuname},
+			iconCls=#{iconCls},
+			url=#{url},
+			parent_id=#{parent_id}
+		<where>
+			menuid=#{menuid}	
+		</where>
+	</update>
+	<insert id="addMenu" useGeneratedKeys="true" keyProperty="menuid">
+		insert into menu value(
+			#{menuid},
+			#{menuname},
+			#{iconCls},
+			#{url},
+			#{parent_id}
+		)
+	</insert>
+	<delete id="deleteMenu">
+		delete from menu where menuid=#{menuid}
+	</delete>
+</mapper>

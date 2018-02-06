@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.baizhi.dao.VoiceDAO">
+<resultMap type="voice" id="voiceMap">
+	<id column="avid" property="vid"/>
+	<result column="aaid" property="aid"/>
+	<result column="avname" property="vname"/>
+	<result column="amid" property="mid"/>
+	<result column="adownloads" property="downloads"/>
+	<result column="asize" property="size"/>
+	<result column="astatus" property="status"/>
+	<result column="avurl" property="vurl"/>
+	<association property="album" javaType="album">
+		<id column="baid" property="aid"/>
+		<result column="baname" property="aname"/>
+		<result column="bacontent" property="acontent"/>
+		<result column="bapictureurl" property="apictureurl"/>
+		<result column="bmid" property="mid"/>
+		<result column="bagrade" property="agrade"/>
+		<result column="bstatus" property="status"/>
+		<result column="batime" property="atime"/>
+	</association>
+</resultMap>
+<sql id="VOICEALBUM">
+	a.vid as avid,a.aid as aaid,a.vname as avname,a.mid as amid,
+	a.downloads as adownloads,a.size as asize,a.status as astatus,a.vurl as avurl,
+	b.aid as baid,b.aname as baname,b.acontent as bacontent,b.apictureurl as bapictureurl,
+	b.mid as bmid,b.agrade as bagrade,b.status as bstatus,b.atime as batime
+</sql>
+<select id="queryAllVoice" resultMap="voiceMap">
+	select <include refid="VOICEALBUM"/>
+	from voice a left join album b 
+	on a.aid=b.aid
+</select>
+<select id="queryByPage" resultMap="voiceMap">
+	select <include refid="VOICEALBUM"/>
+	from voice a left join album b 
+	on a.aid=b.aid
+	limit #{start},#{end}
+</select>
+<select id="queryVoiceCount" resultType="Integer">
+	select count(*) from voice
+</select>
+</mapper>

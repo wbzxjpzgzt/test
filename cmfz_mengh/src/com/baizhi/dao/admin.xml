@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.baizhi.dao.AdminDAO">
+<!-- <resultMap type="admin" id="adminMap">
+	<id column="aadminid" property="adminid"/>
+	<result column="aadminname" property="adminname"/>
+	<result column="asalt" property="salt"/>
+	<result column="apassword" property="password"/>
+	<result column="astatus" property="status"/>
+	<result column="alogintime" property="logintime"/>
+	<result column="aip" property="ip"/>
+	<collection property="roles" ofType="role">
+		<id column="bid" property="id"/>
+		<result column="brolename" property="rolename"/>
+	</collection>
+</resultMap>
+<resultMap type="admin" id="resourceMap">
+	<id column="aadminid" property="adminid"/>
+	<result column="aadminname" property="adminname"/>
+	<result column="asalt" property="salt"/>
+	<result column="apassword" property="password"/>
+	<result column="astatus" property="status"/>
+	<result column="alogintime" property="logintime"/>
+	<result column="aip" property="ip"/>
+	<collection property="roles" ofType="role">
+		<id column="bid" property="id"/>
+		<result column="brolename" property="rolename"/>
+	</collection>
+</resultMap> -->
+
+	<select id="queryByName" resultType="admin">
+		select * from admin where adminname=#{adminname}
+	</select>
+	<select id="queryByNameAndPassword" resultType="admin">
+		select * from admin where adminname=#{adminname} and password=#{password}
+	</select>
+	<select id="queryRoleByName" resultType="role">
+		select a.id,a.rolename
+		
+		from role a left join admin b 
+		on a.id=b.adminid
+		where b.adminname=#{adminname}
+	</select>
+	<select id="querySourceByName" resultType="resources">
+		select a.id,a.name,a.href,a.tag
+		from resource a left join roleresource b
+		on a.id=b.resourceid
+		left join role c
+		on b.roleid=c.id
+		left join adminrole d
+		on c.id=d.roleid
+		left join admin e
+		on d.adminid=e.adminid
+		where e.adminname=#{adminname}
+	</select>
+</mapper>

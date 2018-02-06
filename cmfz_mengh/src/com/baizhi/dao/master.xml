@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.baizhi.dao.MasterDAO">
+<select id="queryPage" resultType="master">
+	select * from master limit #{start},#{end}
+</select>
+	
+<select id="queryCountMaster" resultType="Integer">
+	select count(*) from master
+</select>
+<select id="queryOneMaster" resultType="master">
+	select * from master where mid=#{mid}
+</select>
+</mapper>

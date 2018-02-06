@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- 
+	dtd约束(document type definition)：xxx.dtd  xxx2.dtd
+	                               : struts2  mybatis  hibernate
+    xsd约束(xml schema definition):xxx.xsd   xxx2.xsd
+                                 :spring
+        告知spring哪些组件(component)需要生产
+ -->
+<beans xmlns="http://www.springframework.org/schema/beans" 
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+	                       http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+	                       http://www.springframework.org/schema/mvc
+	                       http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+	                       http://www.springframework.org/schema/context
+	                       http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+	
+	<!-- 扫描所有的Controller
+	     use-default-filters=true 如果类上有 @Controller @Service @repository @Component,则类中所有注解会被扫描  
+	     use-default-filters=false 不主动扫描任何类
+	 -->
+	
+	<!-- 扫描所有的Controller -->
+	<context:component-scan base-package="com.baizhi.controller"></context:component-scan>
+	<!-- <context:component-scan base-package="com.baizhi" use-default-filters="false">
+	 	<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+	 </context:component-scan> -->
+	<!-- 注解驱动 -->
+	<mvc:annotation-driven>
+		<mvc:message-converters>
+			<!-- 安装FastJson -->
+			<bean class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">
+				<!-- 声明此Converter，只负责做java到json的转换 -->
+				<property name="supportedMediaTypes">
+					<list>
+						<value>application/json</value>
+					</list>
+				</property>
+			</bean>
+		</mvc:message-converters>
+	</mvc:annotation-driven>
+	<!-- 视图解析器 
+	     解析行为：
+	       1.捕获后端控制器方法的返回值：index   abc
+	       2.解析：在返回值的前后拼接：  /index.jsp     /abc.jsp
+	-->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		
+		<property name="prefix" value="/"></property>
+		<property name="suffix" value=".jsp"></property>
+	</bean>
+	<!-- 
+	  url-pattern:/* 一切
+	  requestmapping：/*  一切一级路径   /a   /b   /c   /abc
+	                  /** 一切   /a  /b  /a/b   /a/b/c
+	   会多注册一个handler(C中的方法)，且它的requestMapping是"/**",且它的匹配顺序是最后一个，且它会调用tomcat中名为default的全局Servlet
+	 -->
+	<mvc:default-servlet-handler/>
+	
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="maxUploadSize" value="2022222222"></property>
+	</bean>
+	
+</beans>

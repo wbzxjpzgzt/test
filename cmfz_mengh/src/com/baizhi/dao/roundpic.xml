@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.baizhi.dao.RoundPicDAO">
+
+	<select id="queryByPage" resultType="roundPicture">
+		select * from roundpicture limit #{start},#{end}
+	</select>
+	<select id="queryCount" resultType="Integer">
+		select count(*) from roundpicture
+	</select>
+	<insert id="addPic">
+		insert into roundpicture value(
+				#{rpicid},
+				#{picname},
+				#{picdiscribe},
+				#{picstatus},
+				#{pictime}
+		)
+	</insert>
+	<delete id="deletePic">
+		delete from roundpicture where rpicid=#{rpicid}
+	</delete>
+	<select id="queryByRpicid" resultType="roundPicture" >
+		select * from roundpicture where rpicid=#{rpicid}
+	</select>
+	<update id="updatePic">
+		update roundpicture set 
+				
+				picstatus=#{picstatus}
+				
+				where rpicid=#{rpicid}
+	</update>
+</mapper>

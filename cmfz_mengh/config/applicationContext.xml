@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:tx="http://www.springframework.org/schema/tx"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+	   					   http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+						   http://www.springframework.org/schema/aop
+						   http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+						   http://www.springframework.org/schema/tx
+						   http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+						   http://www.springframework.org/schema/context
+						   http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+<!--shiro配置导入  -->
+<import resource="classpath:shiro.xml"/>
+<!-- 导入外部的参数 -->
+
+<context:property-placeholder location="classpath:jdbc.properties"/>
+<!--实体类注册 -->
+<bean id="pageLog" class="com.baizhi.entity.PageLog" ></bean>
+<bean id="menu" class="com.baizhi.entity.Menu" ></bean>
+<bean id="pageRoundPicture" class="com.baizhi.entity.PageRoundPicture" ></bean>
+<bean id="pageUser" class="com.baizhi.entity.PageUser" ></bean>
+<!-- druid连接池 -->
+<bean id="dataSourceCmfz" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+	<!--基本属性 url name password  -->
+	<property name="url" value="${jdbc.url}"></property>
+	<property name="username" value="${jdbc.username}"></property>
+	<property name="password" value="${jdbc.password}"></property>
+	      <!-- 配置初始化大小、最小、最大 -->
+    <property name="initialSize" value="${jdbc.initialSize}" />
+    <property name="minIdle" value="${jdbc.minIdle}" /> 
+    <property name="maxActive" value="${jdbc.maxActive}" />
+
+   	<!-- 配置获取连接等待超时的时间 -->
+    <property name="maxWait" value="${jdbc.maxWait}" />
+
+    <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+    <property name="timeBetweenEvictionRunsMillis" value="${jdbc.timeBetweenEvictionRunsMillis}" />
+
+    <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+    <property name="minEvictableIdleTimeMillis" value="${jdbc.minEvictableIdleTimeMillis}" />
+	<!-- 验证时刻 -->
+    <property name="testWhileIdle" value="${jdbc.testWhileIdle}" />
+    <property name="testOnBorrow" value="${jdbc.testOnBorrow}" />
+    <property name="testOnReturn" value="${jdbc.testOnReturn}" />
+</bean>
+<!-- 声明工厂 -->
+<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+	<!-- 数据源 -->
+	<property name="dataSource" ref="dataSourceCmfz"></property>
+	<!--daomapper配置  -->
+	<property name="mapperLocations">
+		<list>
+			<value>classpath:com/baizhi/dao/*.xml</value>
+		</list>
+	</property>
+	<!--别名 缺省包  -->
+	<property name="typeAliasesPackage" value="com.baizhi.entity"></property>
+</bean>
+<!-- 声明MapperScannerConfigurer -->
+<bean  class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+	<property name="basePackage" value="com.baizhi.dao"></property>
+	<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+</bean>
+
+<!--事务管理器  -->
+<bean id="tx" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+	<property name="dataSource" ref="dataSourceCmfz"></property>
+</bean>
+<!-- 包装 -->
+	
+<!-- 扫描器 -->
+<context:component-scan base-package="com.baizhi" use-default-filters="true">
+	<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+</context:component-scan>
+  <!-- 通知spring识别@Aspect注解,false   使用的是cglib继承类 -->
+	<aop:aspectj-autoproxy/>
+ <tx:annotation-driven transaction-manager="tx"/>
+ <bean id="logAroundAdvice" class="com.baizhi.advice.AroungLogAdvice">
+ 	<property name="ls" ref="logServiceImpl"></property>
+ </bean>
+ <aop:config>
+ 	<aop:pointcut expression="execution(* com.baizhi.service.*.*(..))" id="cut"/>
+ 	<aop:advisor advice-ref="logAroundAdvice" pointcut-ref="cut"/>
+ </aop:config>
+ 
+ 
+ <!-- 测试缓存配置 -->
+ 	<!-- 单个 SSDB 服务器的配置，其他几个类似的构造方法在此略去 -->
+<!-- <bean id="singleServerSsdbClient" class="com.baizhi.dao.cache.SsdbCache" destroy-method="close">
+    <constructor-arg name="host" value="192.168.174.131"/>
+    <constructor-arg name="port" value="8888"/>
+</bean> -->
+</beans>	
